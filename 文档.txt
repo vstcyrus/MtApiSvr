@@ -1,0 +1,33 @@
+在新版本的 Boost.Asio 中，boost::asio::io_context::work 已被弃用或移除，取而代之的是使用 boost::asio::executor_work_guard。executor_work_guard 提供了一种更灵活且与现代 C++ 标准更兼容的方式来保持 io_context 运行，防止其在没有待处理任务时退出。
+2小时前
+
+
+回复
+
+
+恋恋风辰zack
+
+
+ 回复 @bili_31934158556 : #include <boost/asio.hpp>
+
+#include <memory>int main()
+
+{
+
+boost::asio::io_context io_context; // 创建一个 executor_work_guard 来保持 io_context 运行
+
+auto work_guard = boost::asio::make_work_guard(io_context); // 启动一个线程来运行 io_context
+
+std::thread io_thread(【&io_context】() {
+
+io_context.run();
+
+}); // 在这里可以添加你的异步任务
+
+// ... // 当你准备停止 io_context 时，重置 work_guard
+
+work_guard.reset(); // 等待 io_context 运行完毕
+
+io_thread.join(); return 0;
+
+}
